@@ -1,23 +1,158 @@
-@Host=http://127.0.0.1
-@Port=3001
-@EndpointTempalte = api/book
+### API RESTful de Gestión de Productos - Archivo de Tests
+### Archivo compatible con extensión "REST Client" de VS Code
 
-@mongoId=68f9854ee8539580dad010d6
+# ===== VARIABLES =====
+@baseUrl = http://localhost:3000
+@apiKey = tu-api-key-aqui
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
+---
 
-###  Validacion de seleccion all
-GET  {{Host}}:{{Port}}/{{EndpointTempalte}}/all
+## 🟢 CREAR PRODUCTO (SIN AUTENTICACIÓN)
+POST {{baseUrl}}/api/v1/productos
+Content-Type: application/json
 
-###  Validacion de seleccion
-GET  {{Host}}:{{Port}}/{{EndpointTempalte}}/select/{{mongoId}}
+{
+  "producto": "Laptop Dell XPS 15",
+  "stockAmount": 5,
+  "fechaIngreso": "2025-12-14"
+}
 
+### CREAR PRODUCTO - SIN FECHA (por defecto usa hoy)
+POST {{baseUrl}}/api/v1/productos
+Content-Type: application/json
 
-###  Validacion de borrado
-DELETE  {{Host}}:{{Port}}/{{EndpointTempalte}}/delete/9
+{
+  "producto": "Mouse Logitech",
+  "stockAmount": 25
+}
 
+### CREAR PRODUCTO - VALIDACIÓN FALLIDA (stock negativo)
+POST {{baseUrl}}/api/v1/productos
+Content-Type: application/json
 
-###  Creacion de Libro
-POST  {{Host}}:{{Port}}/{{EndpointTempalte}}/create
+{
+  "producto": "Teclado",
+  "stockAmount": -5
+}
+
+### CREAR PRODUCTO - VALIDACIÓN FALLIDA (producto vacío)
+POST {{baseUrl}}/api/v1/productos
+Content-Type: application/json
+
+{
+  "producto": "",
+  "stockAmount": 10
+}
+
+---
+
+## 🔵 LISTAR TODOS LOS PRODUCTOS (SIN AUTENTICACIÓN)
+GET {{baseUrl}}/api/v1/productos
+
+---
+
+## 🟡 OBTENER PRODUCTO POR ID (SIN AUTENTICACIÓN)
+GET {{baseUrl}}/api/v1/productos/1
+
+### OBTENER PRODUCTO POR ID - NO EXISTE
+GET {{baseUrl}}/api/v1/productos/999
+
+---
+
+## 🟠 ACTUALIZAR PRODUCTO CON X-API-KEY
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "stockAmount": 15
+}
+
+### ACTUALIZAR PRODUCTO CON X-API-KEY - INVÁLIDA
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+x-api-key: api-key-incorrecta
+
+{
+  "stockAmount": 20
+}
+
+### ACTUALIZAR PRODUCTO CON JWT TOKEN
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "producto": "Laptop Dell XPS 15 - Editada"
+}
+
+### ACTUALIZAR PRODUCTO SIN AUTENTICACIÓN (ERROR 401)
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+
+{
+  "stockAmount": 30
+}
+
+### ACTUALIZAR SOLO NOMBRE
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "producto": "Laptop Dell XPS 15 Pro"
+}
+
+### ACTUALIZAR FECHA
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "fechaIngreso": "2025-01-01"
+}
+
+### ACTUALIZAR CON VALIDACIÓN FALLIDA (fecha incorrecta)
+PUT {{baseUrl}}/api/v1/productos/1
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "fechaIngreso": "14/12/2025"
+}
+
+---
+
+## 🔴 ELIMINAR PRODUCTO CON X-API-KEY
+DELETE {{baseUrl}}/api/v1/productos/1
+x-api-key: {{apiKey}}
+
+### ELIMINAR PRODUCTO CON JWT TOKEN
+DELETE {{baseUrl}}/api/v1/productos/2
+Authorization: Bearer {{token}}
+
+### ELIMINAR PRODUCTO SIN AUTENTICACIÓN (ERROR 401)
+DELETE {{baseUrl}}/api/v1/productos/3
+
+### ELIMINAR PRODUCTO QUE NO EXISTE
+DELETE {{baseUrl}}/api/v1/productos/999
+x-api-key: {{apiKey}}
+
+---
+
+## ℹ️ INSTRUCCIONES IMPORTANTES:
+
+# Variables REST Client:
+# 1. Actualiza @baseUrl según tu configuración
+# 2. Actualiza @apiKey con tu valor de variable de entorno
+# 3. Actualiza @token con un JWT válido
+
+# Cómo usar:
+# - Instala extensión "REST Client" en VS Code
+# - Haz clic en "Send Request" sobre cada request
+# - O presiona Ctrl+Alt+R para enviar
+
 Content-Type: application/json
 
 {
